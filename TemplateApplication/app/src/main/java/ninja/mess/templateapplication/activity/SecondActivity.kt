@@ -9,33 +9,26 @@ import ninja.mess.templateapplication.R
 import ninja.mess.templateapplication.service.backbone.BackboneConnector
 import rx.android.schedulers.AndroidSchedulers
 
-class MainActivity: RxAppCompatActivity() {
+class SecondActivity: RxAppCompatActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
 
-            BackboneConnector.bindToLifecycle(BackboneConnector.BindParams(this),this).subscribe{
+            BackboneConnector.bindToLifecycle(BackboneConnector.BindParams(this), this).subscribe {
                 it.subscribe({
                     val backbone = it
                     Log.d("Test", "New Backbone $backbone")
 
-                    backbone.someData.propertyA.bindToLifecycle(textView).observeOn(AndroidSchedulers.mainThread()).subscribe{
+                    backbone.someData.propertyB.bindToLifecycle(textView).observeOn(AndroidSchedulers.mainThread()).subscribe {
                         textView.text = "Some Data: ${it}"
                     }
-                    button.setOnClickListener{
-                        backbone.someData.propertyA.onNext(backbone.someData.propertyA.value+1)
+                    button.setOnClickListener {
+                        backbone.someData.propertyB.onNext(backbone.someData.propertyB.value + 1)
                     }
-                },{
-                    Log.d("Test", "Backbone Error $it")
-                },{
-                    Log.d("Test", "Backbone Disconnected $it")
                 })
             }
 
-
-
-            lifecycle().subscribe({Log.d("Test", "Success$it")},{Log.e("Test", it.message, it)})
         }
 }
 

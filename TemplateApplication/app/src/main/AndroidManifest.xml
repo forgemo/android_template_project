@@ -17,7 +17,7 @@
         </activity>
 
         <service
-            android:name=".service.Backbone"
+            android:name=".service.backbone.BackboneService"
             android:enabled="true"
             android:exported="true">
         </service>

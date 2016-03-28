@@ -1,8 +1,10 @@
 package ninja.mess.templateapplication.model
 
-import rx.Observable
+import rx.subjects.BehaviorSubject
 
 /**
  * Created by elbatya on 19.03.16.
  */
-data class MyModel(val propertyA: Int, val propertyB: Int)
+class MyModel(val propertyA: BehaviorSubject<Int> = BehaviorSubject.create(0), val propertyB: BehaviorSubject<Int> =  BehaviorSubject.create(0)){
+
+}
