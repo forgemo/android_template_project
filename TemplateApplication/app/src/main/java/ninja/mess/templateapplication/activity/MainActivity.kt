@@ -19,6 +19,7 @@ class MainActivity: RxAppCompatActivity() {
                 it.subscribe({
                     val backbone = it
                     Log.d("Test", "New Backbone $backbone")
+                    it.someData.propertyA
 
                     backbone.someData.propertyA.bindToLifecycle(textView).observeOn(AndroidSchedulers.mainThread()).subscribe{
                         textView.text = "Some Data: ${it}"
@@ -34,8 +35,7 @@ class MainActivity: RxAppCompatActivity() {
             }
 
 
-
-            lifecycle().subscribe({Log.d("Test", "Success$it")},{Log.e("Test", it.message, it)})
+            lifecycle().subscribe({Log.d("Test", "Success: $it")},{Log.e("Test: ", it.message, it)})
         }
 }
 

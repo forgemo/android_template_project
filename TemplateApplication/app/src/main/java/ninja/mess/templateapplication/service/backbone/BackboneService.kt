@@ -7,8 +7,10 @@ import android.os.IBinder
 
 class BackboneService : Service() {
 
+    val backbone = Backbone()
+
     override fun onBind(intent: Intent): IBinder? {
-        return BackboneBinder(Backbone())
+        return BackboneBinder(backbone)
     }
 
     inner class BackboneBinder(val backbone: Backbone) : Binder()

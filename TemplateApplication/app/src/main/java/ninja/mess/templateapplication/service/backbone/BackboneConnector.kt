@@ -8,6 +8,8 @@ import android.os.IBinder
 import android.util.Log
 import com.trello.rxlifecycle.ActivityEvent
 import com.trello.rxlifecycle.ActivityLifecycleProvider
+import com.trello.rxlifecycle.FragmentEvent
+import com.trello.rxlifecycle.FragmentLifecycleProvider
 import com.trello.rxlifecycle.kotlin.bindUntilEvent
 import rx.subjects.BehaviorSubject
 
@@ -17,6 +19,43 @@ import rx.subjects.BehaviorSubject
 class BackboneConnector(){
 
     companion object {
+
+        fun bindToLifecycle(bindParams: BindParams,lifecycleProvider: FragmentLifecycleProvider) : BehaviorSubject<BehaviorSubject<Backbone>>{
+            Log.d("BackboneManager", "bindToLifecycle")
+
+            val backboneSubjectStream = BehaviorSubject.create(BehaviorSubject.create<Backbone>())
+
+            lifecycleProvider.lifecycle()
+                    .bindUntilEvent(lifecycleProvider, FragmentEvent.DESTROY)
+                    .filter({ it== FragmentEvent.START })
+                    .subscribe{
+
+                        Log.d("BackboneManager", "bindBackbone")
+                        val intent = Intent(bindParams.bindSource, BackboneService::class.java)
+                        val serviceConnection = newServiceConnection(backboneSubjectStream)
+                        bindParams.bindSource.bindService(intent, serviceConnection, bindParams.bindServiceFlags)
+
+                        lifecycleProvider.lifecycle()
+                                .bindUntilEvent(lifecycleProvider, FragmentEvent.DESTROY)
+                                .first { it== FragmentEvent.STOP }
+                                .subscribe{
+                                    Log.d("BackboneManager", "unbindBackbone")
+                                    backboneSubjectStream.value.onCompleted()
+                                    bindParams.bindSource.unbindService(serviceConnection)
+                                }
+                    }
+
+
+            lifecycleProvider.lifecycle()
+                    .filter { it== FragmentEvent.DESTROY }
+                    .subscribe{
+                        backboneSubjectStream.onCompleted()
+                    }
+
+            return backboneSubjectStream
+        }
+
+
         fun bindToLifecycle(bindParams: BindParams,lifecycleProvider: ActivityLifecycleProvider) : BehaviorSubject<BehaviorSubject<Backbone>>{
             Log.d("BackboneManager", "bindToLifecycle")
 
